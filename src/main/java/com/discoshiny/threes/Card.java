@@ -3,6 +3,7 @@ package com.discoshiny.threes;
 public class Card {
     public static final Integer ONE_CARD_RANK = -1;
     public static final Integer TWO_CARD_RANK = -2;
+    public static final Integer WILD_RANK = 99;
 
     private final Integer rank;
 
@@ -17,6 +18,10 @@ public class Card {
     public Integer getValue() {
         if (rank == null) {
             return null;
+        }
+
+        if (rank.equals(Card.WILD_RANK)) {
+            return 9999;
         }
 
         if (rank < 0) {
@@ -38,6 +43,10 @@ public class Card {
     public String toString() {
         if (rank == null) {
             return " -- ";
+        }
+
+        if (rank.equals(WILD_RANK)) {
+            return " ?? ";
         }
 
         return String.format("%1$4d", getValue());

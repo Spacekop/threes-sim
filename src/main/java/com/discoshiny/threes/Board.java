@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.Stack;
 import java.util.stream.Collectors;
 
 public class Board {
@@ -19,14 +18,16 @@ public class Board {
     public static final Integer ROWS_COLS = 4;
 
     private final TranslatedCardStack translatedCardStack;
+    private final CardStack cardStack;
     private final PrimeMover mover;
     private final Long seed;
 
     private final List<MoveRecord> moves = new ArrayList<>();
 
-    public Board(Long seed, PrimeMover mover, Stack<Integer> cardStack, Integer[] board) {
+    public Board(Long seed, PrimeMover mover, CardStack cardStack, Integer[] board) {
         this.seed = seed;
         this.mover = mover;
+        this.cardStack = cardStack;
         this.translatedCardStack = new TranslatedCardStack(cardStack);
         moves.add(MoveRecord.InitialState(board));
     }
@@ -64,6 +65,7 @@ public class Board {
             return false;
         }
 
+        cardStack.setLargestRank(getLargestRank());
         moves.add(new MoveRecord(direction, getBoard(), moved));
         return true;
     }
@@ -86,8 +88,21 @@ public class Board {
                 .reduce(0, Integer::sum);
     }
 
+    public Integer getLargestRank() {
+        return Arrays.stream(getBoard())
+                .reduce(0, (a, b) -> {
+                    if (b == null) {
+                        return a;
+                    } else if (a == null) {
+                        return b;
+                    }
+
+                    return a >= b ? a : b;
+                });
+    }
+
     void logBoard() {
-        LOG.info("Next: {}", translatedCardStack.peek().getValue());
+        LOG.info("Next: {}", translatedCardStack.peek());
         LOG.info("==============================");
         for (int i = 0; i < 4; i++) {
             LOG.info("| {} | {} | {} | {} |",
